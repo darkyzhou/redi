@@ -29,7 +29,6 @@ import { IdleValue } from './idleValue'
 import { getSingletonDependencies } from './dependencySingletons'
 import { RediError } from './error'
 import { Quantity, LookUp } from './types'
-import { should } from 'vitest'
 
 const MAX_RESOLUTIONS_QUEUED = 300
 
@@ -65,7 +64,9 @@ export interface InjectorOptions {
 
 export class Injector {
     private readonly dependencyCollection: DependencyCollection
-    private readonly resolvedDependencyCollection = new ResolvedDependencyCollection()
+    private readonly resolvedDependencyCollection = new ResolvedDependencyCollection(
+        this.options.useClassNameForMatching
+    )
 
     private readonly parent: Injector | null
     private readonly children: Injector[] = []
@@ -75,13 +76,16 @@ export class Injector {
     private disposed = false
 
     constructor(
-      collectionOrDependencies?: Dependency[],
-      parent?: Injector,
-      private options: InjectorOptions = {
-          useClassNameForMatching: false
-      },
+        collectionOrDependencies?: Dependency[],
+        parent?: Injector,
+        private options: InjectorOptions = {
+            useClassNameForMatching: false,
+        }
     ) {
-        this.dependencyCollection = new DependencyCollection(collectionOrDependencies || [])
+        this.dependencyCollection = new DependencyCollection(
+            collectionOrDependencies || [],
+            this.options.useClassNameForMatching
+        )
 
         if (!parent) {
             this.parent = null
@@ -90,8 +94,6 @@ export class Injector {
             this.parent = parent
             parent.children.push(this)
         }
-
-        this.resolvedDependencyCollection = new ResolvedDependencyCollection()
     }
 
     public createChild(dependencies?: Dependency[]): Injector {
@@ -119,10 +121,6 @@ export class Injector {
             if (Array.isArray(dependency)) {
                 item = dependency[1]
                 dependency = dependency[0]
-            }
-
-            if (this.options.useClassNameForMatching && typeof dependency === 'function') {
-                dependency = dependency.name
             }
 
             if (
@@ -420,13 +418,6 @@ export class Injector {
             }
         }
 
-        const hasDependency = <T>(id: DependencyIdentifier<T>) => {
-            if (this.options.useClassNameForMatching && typeof id === 'function') {
-                return this.resolvedDependencyCollection.has(id.name) || this.dependencyCollection.has(id.name)
-            }
-            return this.resolvedDependencyCollection.has(id) || this.dependencyCollection.has(id)
-        }
-
         if (lookUp === LookUp.SKIP_SELF) {
             return onParent()
         }
@@ -435,7 +426,7 @@ export class Injector {
             return onSelf()
         }
 
-        if (hasDependency(id)) {
+        if (this.resolvedDependencyCollection.has(id) || this.dependencyCollection.has(id)) {
             return onSelf()
         }
 

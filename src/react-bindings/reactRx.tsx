@@ -10,8 +10,7 @@ import React, {
     useRef,
 } from 'react'
 import { BehaviorSubject, Observable } from 'rxjs'
-
-import { RediError } from '@wendellhu/redi';
+import { RediError } from '../error'
 
 /**
  * unwrap an observable value, return it to the component for rendering, and

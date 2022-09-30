@@ -1,16 +1,18 @@
-import * as React from 'react'
-import { DependencyIdentifier, Injector, LookUp, Quantity, RediError } from '@wendellhu/redi'
-
+import { useContext } from 'react'
+import { DependencyIdentifier } from '../dependencyIdentifier'
+import { RediError } from '../error'
+import { Injector } from '../injector'
+import { LookUp, Quantity } from '../types'
 import { RediContext } from './reactContext'
 
-class HooksNotInRediContextError extends RediError {
+export class HooksNotInRediContextError extends RediError {
     constructor() {
         super('Using dependency injection outside of a RediContext.')
     }
 }
 
 export function useInjector(): Injector {
-    const injectionContext = React.useContext(RediContext)
+    const injectionContext = useContext(RediContext)
     if (!injectionContext.injector) {
         throw new HooksNotInRediContextError()
     }

@@ -13,6 +13,10 @@ export function isBareClassDependency<T>(thing: Dependency<T>): thing is Depende
     return thing.length === 1
 }
 
+function resolveCtorName<T>(id: DependencyIdentifier<T>): DependencyIdentifier<T> {
+    return typeof id === 'function' ? id.name : id
+}
+
 export class DependencyNotFoundError extends RediError {
     constructor(id: DependencyIdentifier<any>) {
         const msg = `Cannot find "${prettyPrintIdentifier(id)}" registered by any injector.`
@@ -29,7 +33,7 @@ export class DependencyNotFoundError extends RediError {
 export class DependencyCollection implements Disposable {
     private readonly dependencyMap = new Map<DependencyIdentifier<any>, DependencyItem<any>[]>()
 
-    constructor(dependencies: Dependency[]) {
+    constructor(dependencies: Dependency[], private useNameForCtor = false) {
         this.normalizeDependencies(dependencies).map((pair) => this.add(pair[0], pair[1]))
     }
 
@@ -38,6 +42,10 @@ export class DependencyCollection implements Disposable {
     public add<T>(ctorOrId: Ctor<T> | DependencyIdentifier<T>, val?: DependencyItem<T>): void {
         if (typeof val === 'undefined') {
             val = { useClass: ctorOrId as Ctor<T>, lazy: false }
+        }
+
+        if (this.useNameForCtor) {
+            ctorOrId = resolveCtorName(ctorOrId)
         }
 
         let arr = this.dependencyMap.get(ctorOrId)
@@ -49,6 +57,9 @@ export class DependencyCollection implements Disposable {
     }
 
     public delete<T>(id: DependencyIdentifier<T>): void {
+        if (this.useNameForCtor) {
+            id = resolveCtorName(id)
+        }
         this.dependencyMap.delete(id)
     }
 
@@ -61,6 +72,10 @@ export class DependencyCollection implements Disposable {
         id: DependencyIdentifier<T>,
         quantity: Quantity = Quantity.REQUIRED
     ): DependencyItem<T> | DependencyItem<T>[] | null {
+        if (this.useNameForCtor) {
+            id = resolveCtorName(id)
+        }
+
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const ret = this.dependencyMap.get(id)!
 
@@ -69,6 +84,10 @@ export class DependencyCollection implements Disposable {
     }
 
     public has<T>(id: DependencyIdentifier<T>): boolean {
+        if (this.useNameForCtor) {
+            id = resolveCtorName(id)
+        }
+
         return this.dependencyMap.has(id)
     }
 
@@ -109,7 +128,13 @@ export class DependencyCollection implements Disposable {
 export class ResolvedDependencyCollection implements Disposable {
     private readonly resolvedDependencies = new Map<DependencyIdentifier<any>, any[]>()
 
+    constructor(private useNameForCtor = false) {}
+
     public add<T>(id: DependencyIdentifier<T>, val: T | null): void {
+        if (this.useNameForCtor) {
+            id = resolveCtorName(id)
+        }
+
         let arr = this.resolvedDependencies.get(id)
         if (typeof arr === 'undefined') {
             arr = []
@@ -120,10 +145,17 @@ export class ResolvedDependencyCollection implements Disposable {
     }
 
     public has<T>(id: DependencyIdentifier<T>): boolean {
+        if (this.useNameForCtor) {
+            id = resolveCtorName(id)
+        }
         return this.resolvedDependencies.has(id)
     }
 
     public delete<T>(id: DependencyIdentifier<T>): void {
+        if (this.useNameForCtor) {
+            id = resolveCtorName(id)
+        }
+
         if (this.resolvedDependencies.has(id)) {
             const things = this.resolvedDependencies.get(id)!
             things.forEach((t) => (isDisposable(t) ? t.dispose() : void 0))
@@ -137,6 +169,10 @@ export class ResolvedDependencyCollection implements Disposable {
     public get<T>(id: DependencyIdentifier<T>, quantity: Quantity.MANY): T[]
     public get<T>(id: DependencyIdentifier<T>, quantity: Quantity): T[] | T | null
     public get<T>(id: DependencyIdentifier<T>, quantity: Quantity = Quantity.REQUIRED): T | T[] | null {
+        if (this.useNameForCtor) {
+            id = resolveCtorName(id)
+        }
+
         const ret = this.resolvedDependencies.get(id)
 
         if (!ret) {

@@ -1,4 +1,7 @@
-import { DependencyIdentifier, Quantity, LookUp, Injector, RediError } from '@wendellhu/redi'
+import { DependencyIdentifier } from '../dependencyIdentifier'
+import { RediError } from '../error'
+import { Injector } from '../injector'
+import { LookUp, Quantity } from '../types'
 
 class ClassComponentNotInRediContextError<T> extends RediError {
     constructor(component: React.Component<T>) {

@@ -1,13 +1,12 @@
 {
     "compilerOptions": {
-        "baseUrl": "./",
         "jsx": "react",
         "lib": [
             "esnext",
             "dom"
         ],
         "sourceMap": true,
-        "target": "es5",
+        "target": "es2015",
         "outDir": "esm",
         "module": "esnext",
         "moduleResolution": "node",
@@ -28,15 +27,7 @@
         ],
         "typeRoots": [
             "./node_modules/@types"
-        ],
-        "paths": {
-            "@wendellhu/redi": [
-                "./src/index.ts"
-            ],
-            "@wendellhu/redi/react-bindings": [
-                "src/react-bindings/index.ts"
-            ]
-        }
+        ]
     },
     "include": [
         "src/**/*"
