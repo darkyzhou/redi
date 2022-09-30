@@ -1,21 +1,34 @@
 {
-    "$schema": "https://raw.githubusercontent.com/hullis/squirrel/master/src/schema/package.schema.json",
-    "name": "@wendellhu/redi",
-    "version": "0.5.1",
+    "name": "@darkyzhou/redi",
+    "version": "0.5.2",
     "description": "A dependency library for TypeScript and JavaScript, along with a binding for React.",
     "scripts": {
         "test": "vitest --coverage",
         "lint": "eslint --fix 'src/**/*.ts'",
         "lint:prettier": "prettier --write '{src,test}/**/*.{ts,tsx}'",
-        "build": "squirrel"
+        "build": "tsup"
     },
-    "exports": {},
-    "squirrel": {
-        "copyFiles": [
-            "README.md",
-            "LICENSE"
-        ]
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "require": "./dist/index.js",
+            "import": "./dist/index.mjs"
+        }
     },
+    "main": "./dist/index.js",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "typesVersions": {
+        "*": {
+            "*": [
+                "./dist/*",
+                "./dist/index.d.ts"
+            ]
+        }
+    },
+    "files": [
+        "dist"
+    ],
     "author": "hullis <hullis@foxmail.com>",
     "license": "MIT",
     "devDependencies": {
@@ -24,19 +37,19 @@
         "@types/react": ">=16.8.0",
         "@typescript-eslint/eslint-plugin": "^4.30.0",
         "@typescript-eslint/parser": "^4.30.0",
-        "@wendellhu/squirrel": "^0.1.4",
         "c8": "^7.11.2",
         "eslint": "^7.32.0",
         "jsdom": "^19.0.0",
         "prettier": "^2.3.2",
         "react": "^16.8.0",
         "react-dom": "^16.8.0",
-        "rxjs": "^6.2.1",
+        "rxjs": "^6.2.1 || ^7",
+        "tsup": "^6.2.3",
         "typescript": "^4.4.2",
         "vitest": "^0.10.0"
     },
     "peerDependencies": {
         "react": ">= 16.8.0",
-        "rxjs": "^6.2.1"
+        "rxjs": "^6.2.1 || ^7"
     }
 }

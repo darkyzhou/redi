@@ -27,3 +27,4 @@ export {
     ValueDependencyItem,
 } from './dependencyItem'
 export { RediError } from './error'
+export * from './react-bindings'
