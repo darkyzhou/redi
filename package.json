@@ -1,6 +1,6 @@
 {
     "name": "@darkyzhou/redi",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "description": "A dependency library for TypeScript and JavaScript, along with a binding for React.",
     "scripts": {
         "test": "vitest --coverage",
