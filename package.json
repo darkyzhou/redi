@@ -30,6 +30,9 @@
         "dist"
     ],
     "author": "hullis <hullis@foxmail.com>",
+    "contributors": [
+        "darkyzhou <darkyoooooo@gmail.com> (https://darkyzhou.net)"
+    ],
     "license": "MIT",
     "devDependencies": {
         "@testing-library/dom": "^8.5.0",
