@@ -1,4 +1,4 @@
-import { DependencyIdentifier } from './dependencyIdentifier'
+import { DependencyIdentifier, IdentifierDecoratorSymbol } from './dependencyIdentifier'
 import { Ctor, DependencyItem, prettyPrintIdentifier } from './dependencyItem'
 import { checkQuantity, retrieveQuantity } from './dependencyQuantity'
 import { Disposable, isDisposable } from './dispose'
@@ -14,7 +14,7 @@ export function isBareClassDependency<T>(thing: Dependency<T>): thing is Depende
 }
 
 function resolveCtorName<T>(id: DependencyIdentifier<T>): DependencyIdentifier<T> {
-    return typeof id === 'function' ? id.name : id
+    return typeof id === 'function' && !(id as any)[IdentifierDecoratorSymbol] ? id.name : id
 }
 
 export class DependencyNotFoundError extends RediError {

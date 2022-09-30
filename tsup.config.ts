@@ -5,6 +5,7 @@ export default defineConfig({
   clean: true,
   dts: true,
   format: ['cjs', 'esm'],
-  target: 'node18',
+  target: 'node14',
+  platform: 'browser',
   external: ['react', 'rxjs']
 })
